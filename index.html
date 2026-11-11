@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,25 +20,24 @@ button.secondary{background:#efe5d6;color:var(--ink)}button.danger{background:va
 .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 16px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
 .product{background:var(--paper);border:1px solid var(--line);border-radius:13px;overflow:hidden}.product img{width:100%;height:190px;object-fit:cover;background:#eee5d8;display:block}
 .product .info{padding:11px}.product h3{font-size:15px;margin:0 0 5px}.price{font-weight:750;color:#99733b}.muted{color:var(--muted);font-size:12px}
-.product button{width:100%;margin-top:9px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;margin:18px 0}
+.product button{width:100%;margin-top:9px}.option-select{margin:8px 0 0}.wa-float{position:fixed;right:16px;bottom:16px;z-index:10;background:#198754;color:white;text-decoration:none;border-radius:30px;padding:12px 16px;box-shadow:0 4px 16px #0002;font-weight:700}.wa-link{color:#198754;font-weight:700;text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;margin:18px 0}
 .hidden{display:none!important}input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fffdf9;color:var(--ink);font:inherit;margin:5px 0 12px}
 label{font-size:13px;color:var(--muted)}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .cartrow{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0;align-items:center}
 .notice{padding:12px;background:#f3eadc;border-radius:8px;color:#725b37;margin:10px 0}.foot{text-align:center;color:var(--muted);padding:28px;font-size:12px}
 .smallbtn{padding:7px 10px;font-size:13px}.product-desc{font-size:12px;color:var(--muted);margin-top:5px;white-space:pre-wrap}
 .order-card{border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0}.order-card p{margin:5px 0}
+.status{padding:12px;border-radius:8px;background:#f3eadc;color:#725b37;margin:12px 0;white-space:pre-wrap}
 @media(max-width:560px){.hero h1{font-size:28px}.formgrid{grid-template-columns:1fr}.product img{height:170px}.brand{font-size:19px}}
 </style>
 </head>
 <body>
 <header><div class="head"><div><div class="brand">Hijabi Queen Boutique</div><div class="sub">MODESTY • STYLE • ELEGANCE</div></div><button class="secondary" id="cartBtn">Cart <span id="cartCount">0</span></button></div></header>
-
 <main class="wrap">
 <section class="hero"><h1>Elegance in Every Detail</h1><p>Discover modest fashion and everyday essentials</p></section>
 <nav class="cats" id="categories"></nav>
 <div class="bar"><strong id="listingTitle">Latest collection</strong><span class="muted" id="productCount"></span></div>
-<section class="grid" id="products"><p class="muted">Loading collection…</p></section>
-
+<section class="grid" id="products"><p class="muted">Connecting to the collection…</p></section>
 <section class="panel hidden" id="cartPanel">
  <div class="bar"><h2>Your cart</h2><button class="secondary" id="closeCart">Close</button></div>
  <div id="cartItems"></div><h3 id="cartTotal">Total: ₹0</h3>
@@ -48,8 +46,8 @@ label{font-size:13px;color:var(--muted)}.formgrid{display:grid;grid-template-col
  <label>Delivery address</label><textarea id="buyerAddress" rows="2" placeholder="Full address" autocomplete="street-address"></textarea>
  <button id="orderBtn">Place order on WhatsApp</button>
  <p class="muted">No online payment is collected on this website. Confirm payment and delivery directly on WhatsApp.</p>
+ <div id="orderStatus" class="status hidden"></div>
 </section>
-
 <section class="panel hidden" id="adminPanel">
  <div class="bar"><h2>Store admin</h2><button class="secondary" id="logoutBtn">Log out</button></div>
  <div id="loginBox"><p class="muted">Sign in with your authorised boutique admin account.</p>
@@ -66,69 +64,70 @@ label{font-size:13px;color:var(--muted)}.formgrid{display:grid;grid-template-col
    <div><label>Price (₹)</label><input id="pPrice" type="number" min="0" step="1"></div>
    <div><label>Quantity / stock</label><input id="pQty" type="number" min="0" step="1" value="1"></div>
   </div>
-  <label>Colours (comma separated)</label><input id="pColors" placeholder="Beige, Mocha, Black">
+  <label id="optionLabel">Colours / Designs (one per line)</label><div id="optionRows"></div><button type="button" class="secondary smallbtn" id="addOption">+ Add Color / Design</button><p class="muted">ஒவ்வொரு Color / Design-க்கும் பெயரும் விருப்பமாக தனிப் படமும் சேர்க்கலாம். பழைய products-ன் colours தானாக options ஆக வரும்.</p><input id="pColors" type="hidden">
   <label>Description</label><textarea id="pDescription" rows="2"></textarea>
-  <label>Product photo (choose a new photo only when adding/changing it)</label><input id="pImage" type="file" accept="image/*">
+  <label>Product photo</label><input id="pImage" type="file" accept="image/*">
   <button id="saveProduct">Save product</button> <button class="secondary" id="clearForm">Clear</button>
   <h3>Your products</h3><div id="adminProducts"></div>
   <h3>Customer orders</h3><div id="adminOrders"><p class="muted">Loading orders…</p></div>
  </div>
 </section>
 </main>
-<footer class="foot">© Hijabi Queen Boutique</footer>
-
+<footer class="foot">© Hijabi Queen Boutique<br><a class="wa-link" href="https://wa.me/918248867975" target="_blank">WhatsApp Chat: +91 82488 67975</a></footer><a class="wa-float" href="https://wa.me/918248867975" target="_blank" aria-label="Chat on WhatsApp">WhatsApp Chat</a>
 <script>
+'use strict';
 const SUPABASE_URL='https://xhppyolpgwhacldbkmsi.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_6OaOwZ-sfZd-VJYWl0fE7w_d6OH5RZx';
 const WHATSAPP_NUMBER='918248867975';
 const ADMIN_EMAIL='saleemshifa98@gmail.com';
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const cats=['All','Hijabs','Abayas','Nighties','Accessories','Coverings','Offers'];
-let products=[],cart=[],activeCat='All',currentUser=null;
 const $=id=>document.getElementById(id);
 const money=n=>'₹'+Number(n||0).toLocaleString('en-IN');
 function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+if(!window.supabase){$('products').innerHTML='<p class="status">The store service did not load. Please refresh the page or check your internet connection.</p>';throw new Error('Supabase library did not load');}
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const cats=['All','Hijabs','Abayas','Nighties','Accessories','Coverings','Offers'];
+let products=[],cart=[],activeCat='All',currentUser=null,adminOptions=[];
+function optionLabel(category){return category==='Hijabs'?'Color':'Design'}
+function getOptions(p){let raw=p?.colors||'';try{let v=JSON.parse(raw);if(v&&v.__hq_options)return v.__hq_options.map(x=>({name:x.name||'',image:x.image||''})).filter(x=>x.name)}catch(e){}return String(raw).split(',').map(x=>x.trim()).filter(Boolean).map(name=>({name,image:''}))}
+function renderOptionRows(){const label=optionLabel($('pCategory').value);$('optionLabel').textContent=label+' options';$('addOption').textContent='+ Add '+label;$('optionRows').innerHTML=adminOptions.map((o,i)=>`<div class="panel" style="margin:7px 0;padding:10px"><label>${label} ${i+1} name</label><input data-opt-name="${i}" value="${safe(o.name)}" placeholder="${label} ${i+1}"><label>Option photo (optional)</label><input data-opt-file="${i}" type="file" accept="image/*"><small class="muted">${o.image?'Photo already saved':''}</small> <button type="button" class="danger smallbtn" data-opt-remove="${i}">Remove</button></div>`).join('');document.querySelectorAll('[data-opt-name]').forEach(x=>x.oninput=()=>adminOptions[Number(x.dataset.optName)].name=x.value);document.querySelectorAll('[data-opt-remove]').forEach(x=>x.onclick=()=>{adminOptions.splice(Number(x.dataset.optRemove),1);renderOptionRows()})}
+$('addOption').onclick=()=>{adminOptions.push({name:'',image:''});renderOptionRows()};$('pCategory').onchange=renderOptionRows;
 function imgFor(p){let u=p.image_urls;if(Array.isArray(u))return u[0]||'';if(typeof u==='string'){try{let a=JSON.parse(u);return Array.isArray(a)?a[0]||'':u}catch{return u}}return ''}
 function drawCats(){
  $('categories').innerHTML=cats.map(c=>`<button class="${activeCat===c?'active':''}" data-cat="${safe(c)}">${safe(c)}</button>`).join('');
  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{activeCat=b.dataset.cat;drawCats();drawProducts()});
 }
 async function loadProducts(){
- $('products').innerHTML='<p class="muted">Loading collection…</p>';
- const {data,error}=await db.from('products').select('*').eq('is_active',true).order('created_at',{ascending:false});
- if(error){$('products').innerHTML='<p class="muted">Could not load products. Please check the Supabase products table and public read policy.</p>';console.error(error);return}
- products=data||[];drawProducts();
+ $('products').innerHTML='<p class="muted">Connecting to the collection…</p>';
+ try{
+  const result=await Promise.race([
+   db.from('products').select('*').eq('is_active',true).order('created_at',{ascending:false}),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('Connection timed out. Please refresh and check internet/Supabase status.')),15000))
+  ]);
+  if(result.error){$('products').innerHTML='<p class="status">Products could not be loaded: '+safe(result.error.message)+'<br>Please check the products table and its public SELECT permission in Supabase.</p>';return}
+  products=result.data||[];drawProducts();
+ }catch(e){$('products').innerHTML='<p class="status">Collection loading failed: '+safe(e.message||e)+'<br>Please refresh the page. If it continues, send this message to support.</p>';console.error(e)}
 }
 function drawProducts(){
  const list=products.filter(p=>activeCat==='All'||p.category===activeCat);
  $('listingTitle').textContent=activeCat==='All'?'Latest collection':activeCat;
  $('productCount').textContent=list.length+' items';
- $('products').innerHTML=list.length?list.map(p=>{
-  const image=imgFor(p)||'https://placehold.co/500x600/f1e8da/8a7048?text=Hijabi+Queen';
-  return `<article class="product"><img src="${safe(image)}" alt="${safe(p.name)}" loading="lazy"><div class="info"><h3>${safe(p.name)}</h3><div class="price">${money(p.price)}</div><div class="muted">${safe(p.colors||'')}${Number(p.item_count)<=0?' • Out of stock':''}</div>${p.description?`<div class="product-desc">${safe(p.description)}</div>`:''}<button ${Number(p.item_count)<=0?'disabled':''} data-add="${safe(p.id)}">Add to cart</button></div></article>`;
- }).join(''):'<p class="muted">No products in this category yet. New arrivals coming soon.</p>';
- document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addCart(b.dataset.add));
+ $('products').innerHTML=list.length?list.map(p=>{const opts=getOptions(p),first=opts[0],image=(first&&first.image)||imgFor(p)||'https://placehold.co/500x600/f1e8da/8a7048?text=Hijabi+Queen';return `<article class="product"><img data-product-image="${safe(p.id)}" src="${safe(image)}" alt="${safe(p.name)}" loading="lazy"><div class="info"><h3>${safe(p.name)}</h3><div class="price">${money(p.price)}</div>${opts.length?`<label>${optionLabel(p.category)} select</label><select class="option-select" data-product-option="${safe(p.id)}">${opts.map((o,i)=>`<option value="${i}">${safe(o.name)}</option>`).join('')}</select>`:''}<div class="muted">${Number(p.item_count)<=0?'Out of stock':''}</div>${p.description?`<div class="product-desc">${safe(p.description)}</div>`:''}<button ${Number(p.item_count)<=0?'disabled':''} data-add="${safe(p.id)}">Add to cart</button></div></article>`}).join(''):'<p class="muted">No products in this category yet. New arrivals coming soon.</p>';
+ document.querySelectorAll('[data-product-option]').forEach(sel=>sel.onchange=()=>{const p=products.find(x=>String(x.id)===sel.dataset.productOption),o=getOptions(p)[Number(sel.value)];const img=document.querySelectorAll('[data-product-image]').length?Array.from(document.querySelectorAll('[data-product-image]')).find(x=>x.dataset.productImage===sel.dataset.productOption):null;if(img)img.src=(o&&o.image)||imgFor(p)||'https://placehold.co/500x600/f1e8da/8a7048?text=Hijabi+Queen'});
+ document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const sel=Array.from(document.querySelectorAll('[data-product-option]')).find(x=>x.dataset.productOption===b.dataset.add);addCart(b.dataset.add,sel?Number(sel.value):0)});
 }
-function addCart(id){
- const p=products.find(x=>String(x.id)===String(id));if(!p)return;
- const row=cart.find(x=>String(x.id)===String(id));
- if(row){if(row.qty>=Number(p.item_count)){alert('Available stock only: '+p.item_count);return}row.qty++}
- else{if(Number(p.item_count)<=0){alert('Out of stock');return}cart.push({id:p.id,name:p.name,price:Number(p.price),qty:1,stock:Number(p.item_count),image:imgFor(p),colors:p.colors||''})}
- drawCart();
-}
+function addCart(id,optionIndex=0){const p=products.find(x=>String(x.id)===String(id));if(!p)return;const opts=getOptions(p),opt=opts[optionIndex]||null;const key=String(id)+'|'+(opt?opt.name:'');const row=cart.find(x=>x.key===key);const totalQty=cart.filter(x=>String(x.id)===String(id)).reduce((a,x)=>a+x.qty,0);if(totalQty>=Number(p.item_count)){alert('Available stock only: '+p.item_count);return}if(row)row.qty++;else cart.push({key,id:p.id,name:p.name,price:Number(p.price),qty:1,stock:Number(p.item_count),image:(opt&&opt.image)||imgFor(p),option:opt?opt.name:'',optionImage:opt?opt.image:'',colors:opt?opt.name:''});drawCart()}
 function drawCart(){
  $('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);
- $('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartrow"><div><b>${safe(x.name)}</b><div class="muted">${safe(x.colors||'')}</div><div style="margin-top:8px"><button class="secondary smallbtn" data-minus="${safe(x.id)}">−</button> <b>${x.qty}</b> <button class="secondary smallbtn" data-plus="${safe(x.id)}">+</button> <button class="danger smallbtn" data-remove="${safe(x.id)}">Delete</button></div></div><strong>${money(x.price*x.qty)}</strong></div>`).join(''):'<p class="muted">Your cart is empty.</p>';
+ $('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartrow"><div><b>${safe(x.name)}</b><div class="muted">${safe(x.option||'')}</div><div style="margin-top:8px"><button class="secondary smallbtn" data-minus="${safe(x.key)}">−</button> <b>${x.qty}</b> <button class="secondary smallbtn" data-plus="${safe(x.key)}">+</button> <button class="danger smallbtn" data-remove="${safe(x.key)}">Delete</button></div></div><strong>${money(x.price*x.qty)}</strong></div>`).join(''):'<p class="muted">Your cart is empty.</p>';
  $('cartTotal').textContent='Total: '+money(cart.reduce((a,x)=>a+x.price*x.qty,0));
- document.querySelectorAll('[data-minus]').forEach(b=>b.onclick=()=>{let x=cart.find(x=>String(x.id)===b.dataset.minus);if(x){x.qty--;if(x.qty<=0)cart=cart.filter(y=>String(y.id)!==b.dataset.minus);drawCart()}});
- document.querySelectorAll('[data-plus]').forEach(b=>b.onclick=()=>{let x=cart.find(x=>String(x.id)===b.dataset.plus);if(x){if(x.qty>=x.stock){alert('Available stock only: '+x.stock);return}x.qty++;drawCart()}});
- document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{cart=cart.filter(x=>String(x.id)!==b.dataset.remove);drawCart()});
+ document.querySelectorAll('[data-minus]').forEach(b=>b.onclick=()=>{let x=cart.find(x=>x.key===b.dataset.minus);if(x){x.qty--;if(x.qty<=0)cart=cart.filter(y=>y.key!==b.dataset.minus);drawCart()}});
+ document.querySelectorAll('[data-plus]').forEach(b=>b.onclick=()=>{let x=cart.find(x=>x.key===b.dataset.plus);if(x){if(x.qty>=x.stock){alert('Available stock only: '+x.stock);return}x.qty++;drawCart()}});
+ document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{cart=cart.filter(x=>x.key!==b.dataset.remove);drawCart()});
 }
 $('cartBtn').onclick=()=>{$('cartPanel').classList.remove('hidden');$('adminPanel').classList.add('hidden');$('cartPanel').scrollIntoView({behavior:'smooth'})};
 $('closeCart').onclick=()=>$('cartPanel').classList.add('hidden');
-
 function orderMessage(name,phone,address,total){
- const lines=cart.map(x=>`• ${x.name}${x.colors?' ('+x.colors+')':''} x ${x.qty} = ${money(x.price*x.qty)}`);
+ const lines=cart.map(x=>`• ${x.name}${x.option?' ('+x.option+')':''} x ${x.qty} = ${money(x.price*x.qty)}`);
  return `Assalamu Alaikum Hijabi Queen Boutique!\nOrder request:\n${lines.join('\n')}\nTotal: ${money(total)}\nName: ${name}\nPhone: ${phone}\nAddress: ${address}`;
 }
 async function tryShareProductPhotos(message){
@@ -137,17 +136,14 @@ async function tryShareProductPhotos(message){
   const files=[];
   for(let i=0;i<cart.length;i++){
    if(!cart[i].image)continue;
-   const response=await fetch(cart[i].image);
-   if(!response.ok)continue;
-   const blob=await response.blob();
-   const ext=(blob.type.split('/')[1]||'jpg').replace('jpeg','jpg');
+   const response=await fetch(cart[i].image);if(!response.ok)continue;
+   const blob=await response.blob();const ext=(blob.type.split('/')[1]||'jpg').replace('jpeg','jpg');
    files.push(new File([blob],`Hijabi-Queen-${i+1}.${ext}`,{type:blob.type||'image/jpeg'}));
   }
   if(files.length&&navigator.canShare({files})){
-   await navigator.share({title:'Hijabi Queen Boutique order',text:message,files});
-   return true;
+   await navigator.share({title:'Hijabi Queen Boutique order',text:message,files});return true;
   }
- }catch(e){console.warn('Photo share unavailable; using WhatsApp text link.',e)}
+ }catch(e){console.warn('Photo share unavailable; falling back to WhatsApp text.',e)}
  return false;
 }
 $('orderBtn').onclick=async()=>{
@@ -155,35 +151,30 @@ $('orderBtn').onclick=async()=>{
  const name=$('buyerName').value.trim(),phone=$('buyerPhone').value.trim(),address=$('buyerAddress').value.trim();
  if(!name||!phone||!address){alert('Please enter your name, phone number and delivery address.');return}
  const total=cart.reduce((a,x)=>a+x.price*x.qty,0);
- const items=cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty,colour:x.colors||'',image:x.image||''}));
+ const items=cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty,colour:x.option||'',option:x.option||'',image:x.image||''}));
  const message=orderMessage(name,phone,address,total);
  const whatsappUrl='https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(message);
  const btn=$('orderBtn');btn.disabled=true;btn.textContent='Submitting order…';
  let saved=false,saveError=null;
- try{
-  const {error}=await db.from('orders').insert([{customer_name:name,phone,address,items,total,status:'New'}]);
-  if(error)saveError=error;else saved=true;
- }catch(e){saveError=e}
+ try{const {error}=await db.from('orders').insert([{customer_name:name,phone,address,items,total,status:'New'}]);if(error)saveError=error;else saved=true}
+ catch(e){saveError=e}
  btn.disabled=false;btn.textContent='Place order on WhatsApp';
- if(!saved){
-  alert('உங்கள் order website-ல் save ஆகவில்லை. WhatsApp-ல் order அனுப்பலாம்; ஆனால் Admin orders பட்டியலில் இது வராது.\n\nகாரணம்: '+(saveError?.message||'Network error'));
- }
+ const status=$('orderStatus');status.classList.remove('hidden');
+ if(!saved){status.textContent='Order database-ல் save ஆகவில்லை. WhatsApp-ல் order அனுப்பலாம்; ஆனால் Admin orders பட்டியலில் வராது. காரணம்: '+(saveError?.message||'Network error')}
+ else status.textContent='Order website-ல் save செய்யப்பட்டது. இப்போது WhatsApp-ல் அனுப்புங்கள்.';
  const shared=await tryShareProductPhotos(message);
  if(!shared)window.location.href=whatsappUrl;
  if(saved){cart=[];drawCart();$('buyerName').value='';$('buyerPhone').value='';$('buyerAddress').value=''}
 };
-
 function isAdmin(user){return !!user&&String(user.email||'').toLowerCase()===ADMIN_EMAIL.toLowerCase()}
 function showAdminRoute(){
  const requested=location.hash==='#admin';
- $('adminPanel').classList.toggle('hidden',!requested);
- $('cartPanel').classList.add('hidden');
+ $('adminPanel').classList.toggle('hidden',!requested);$('cartPanel').classList.add('hidden');
  if(requested){$('adminPanel').scrollIntoView({behavior:'smooth'});refreshAuth()}
 }
 window.addEventListener('hashchange',showAdminRoute);
 async function refreshAuth(){
- const {data,error}=await db.auth.getSession();
- if(error)console.error(error);
+ const {data,error}=await db.auth.getSession();if(error)console.error(error);
  currentUser=data?.session?.user||null;
  if(currentUser&&!isAdmin(currentUser)){await db.auth.signOut();currentUser=null;alert('இந்த email-க்கு Admin அனுமதி இல்லை.')}
  $('loginBox').classList.toggle('hidden',!!currentUser&&isAdmin(currentUser));
@@ -200,7 +191,7 @@ $('loginBtn').onclick=async()=>{
  if(error){alert('Sign in failed: '+error.message);return}
  currentUser=data.user;await refreshAuth();
 };
-$('logoutBtn').onclick=async()=>{await db.auth.signOut();currentUser=null;location.hash='';$('adminPanel').classList.add('hidden');};
+$('logoutBtn').onclick=async()=>{await db.auth.signOut();currentUser=null;location.hash='';$('adminPanel').classList.add('hidden')};
 db.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;if(location.hash==='#admin')setTimeout(refreshAuth,0)});
 async function loadAdminProducts(){
  const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false});
@@ -214,7 +205,7 @@ async function loadAdminOrders(){
  if(error){$('adminOrders').innerHTML='<p class="muted">Could not load orders: '+safe(error.message)+'</p>';return}
  $('adminOrders').innerHTML=(data||[]).map(o=>{
   const its=Array.isArray(o.items)?o.items:[];
-  return `<article class="order-card"><p><b>Order #${safe(o.id)}</b> · <span class="muted">${safe(o.status||'New')}</span></p><p>${safe(o.customer_name)} · ${safe(o.phone)}</p><p>${safe(o.address)}</p><p>${its.map(i=>safe(i.name)+' × '+safe(i.quantity)).join(', ')}</p><p><b>${money(o.total)}</b></p><button class="danger smallbtn" data-order-delete="${safe(o.id)}">Delete order</button></article>`;
+  return `<article class="order-card"><p><b>Order #${safe(o.id)}</b> · <span class="muted">${safe(o.status||'New')}</span></p><p>${safe(o.customer_name)} · ${safe(o.phone)}</p><p>${safe(o.address)}</p><p>${its.map(i=>safe(i.name)+(i.option?' ('+safe(i.option)+')':'')+' × '+safe(i.quantity)).join(', ')}</p><p><b>${money(o.total)}</b></p><button class="danger smallbtn" data-order-delete="${safe(o.id)}">Delete order</button></article>`;
  }).join('')||'<p class="muted">No customer orders yet.</p>';
  document.querySelectorAll('[data-order-delete]').forEach(b=>b.onclick=()=>deleteOrder(b.dataset.orderDelete));
 }
@@ -227,7 +218,7 @@ async function deleteOrder(id){
 function resetForm(){
  $('editId').value='';$('editHeading').textContent='Add product';
  ['pName','pPrice','pColors','pDescription'].forEach(id=>$(id).value='');
- $('pQty').value=1;$('pImage').value='';
+ $('pQty').value=1;$('pImage').value='';adminOptions=[];renderOptionRows();
 }
 $('clearForm').onclick=resetForm;
 async function editProduct(id){
@@ -236,7 +227,7 @@ async function editProduct(id){
  $('editId').value=data.id;$('editHeading').textContent='Edit product';
  $('pName').value=data.name||'';$('pCategory').value=data.category||'Hijabs';
  $('pPrice').value=data.price??0;$('pQty').value=data.item_count??0;
- $('pColors').value=data.colors||'';$('pDescription').value=data.description||'';
+ adminOptions=getOptions(data);renderOptionRows();$('pDescription').value=data.description||'';
  $('pImage').value='';$('manageBox').scrollIntoView({behavior:'smooth'});
 }
 async function deleteProduct(id){
@@ -249,22 +240,12 @@ $('saveProduct').onclick=async()=>{
  if(!isAdmin(currentUser)){alert('Please sign in with the authorised admin account.');return}
  const name=$('pName').value.trim(),price=Number($('pPrice').value),qty=Number($('pQty').value);
  if(!name||!Number.isFinite(price)||price<0||!Number.isFinite(qty)||qty<0){alert('Enter a product name, valid price and stock quantity.');return}
- let imageUrl=null;const file=$('pImage').files[0];
- if(file){
-  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-  const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const up=await db.storage.from('product-images').upload(path,file,{upsert:false,contentType:file.type});
-  if(up.error){alert('Image upload failed: '+up.error.message);return}
-  imageUrl=db.storage.from('product-images').getPublicUrl(path).data.publicUrl;
- }
- const payload={name,category:$('pCategory').value,price,item_count:qty,colors:$('pColors').value.trim(),description:$('pDescription').value.trim(),is_active:true};
- if(imageUrl)payload.image_urls=[imageUrl];
- const id=$('editId').value;
- const result=id?await db.from('products').update(payload).eq('id',id):await db.from('products').insert(payload);
- if(result.error){alert('Could not save product: '+result.error.message);return}
- alert('Product saved.');resetForm();await loadAdminProducts();await loadProducts();
+ const id=$('editId').value;let old=null;if(id){const q=await db.from('products').select('*').eq('id',id).single();if(q.error){alert(q.error.message);return}old=q.data}
+ async function uploadPhoto(file){const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;const up=await db.storage.from('product-images').upload(path,file,{upsert:false,contentType:file.type});if(up.error)throw up.error;return db.storage.from('product-images').getPublicUrl(path).data.publicUrl}
+ try{for(let i=0;i<adminOptions.length;i++){const input=document.querySelector(`[data-opt-file="${i}"]`),file=input?.files?.[0];if(file)adminOptions[i].image=await uploadPhoto(file)}const mainFile=$('pImage').files[0];const imageUrl=mainFile?await uploadPhoto(mainFile):null;const payload={name,category:$('pCategory').value,price,item_count:qty,colors:JSON.stringify({__hq_options:adminOptions.filter(o=>o.name.trim()).map(o=>({name:o.name.trim(),image:o.image||''}))}),description:$('pDescription').value.trim(),is_active:true};if(imageUrl)payload.image_urls=[imageUrl];else if(old?.image_urls)payload.image_urls=old.image_urls;
+ const result=id?await db.from('products').update(payload).eq('id',id):await db.from('products').insert(payload);if(result.error){alert('Could not save product: '+result.error.message);return}alert('Product saved.');resetForm();await loadAdminProducts();await loadProducts();}catch(e){alert('Photo upload failed: '+(e.message||e));return}
 };
-drawCats();drawCart();loadProducts();
+renderOptionRows();drawCats();drawCart();loadProducts();
 if(location.hash==='#admin')showAdminRoute();
 </script>
 </body>
