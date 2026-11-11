@@ -140,7 +140,7 @@ $('orderBtn').onclick=async()=>{
     items:items,
     total:total,
     status:'New'
-  }]).select();
+  });
 
   if(error){
     alert('Order save failed: '+error.message);
