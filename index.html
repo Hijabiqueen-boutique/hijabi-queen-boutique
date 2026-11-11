@@ -26,8 +26,87 @@ function drawCats(){$('categories').innerHTML=cats.map(c=>`<button class="${acti
 async function loadProducts(){const {data,error}=await db.from('products').select('*').eq('is_active',true).order('created_at',{ascending:false});if(error){$('products').innerHTML='<p class="muted">Could not load products. Please check the Supabase products table and public read policy.</p>';return}products=data||[];drawProducts()}
 function imgFor(p){let u=p.image_urls;if(Array.isArray(u))return u[0]||'';if(typeof u==='string'){try{let a=JSON.parse(u);return Array.isArray(a)?a[0]:u}catch{return u}}return ''}
 function drawProducts(){let list=products.filter(p=>activeCat==='All'||p.category===activeCat);$('listingTitle').textContent=activeCat==='All'?'Latest collection':activeCat;$('productCount').textContent=list.length+' items';$('products').innerHTML=list.length?list.map(p=>`<article class="product"><img src="${safe(imgFor(p)||'https://placehold.co/500x600/f1e8da/8a7048?text=Hijabi+Queen')}" alt="${safe(p.name)}"><div class="info"><h3>${safe(p.name)}</h3><div class="price">${money(p.price)}</div><div class="muted">${safe(p.colors||'')} ${Number(p.item_count)<=0?'• Out of stock':''}</div><button ${Number(p.item_count)<=0?'disabled':''} data-add="${safe(p.id)}">Add to cart</button></div></article>`).join(''):'<p class="muted">No products added yet. New arrivals coming soon.</p>';document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addCart(b.dataset.add))}
-function addCart(id){let p=products.find(x=>String(x.id)===String(id));if(!p)return;let row=cart.find(x=>String(x.id)===String(id));if(row)row.qty++;else cart.push({id:p.id,name:p.name,price:Number(p.price),qty:1});drawCart()}
-function drawCart(){$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);$('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartrow"><span>${safe(x.name)} × ${x.qty}</span><strong>${money(x.price*x.qty)}</strong></div>`).join(''):'<p class="muted">Your cart is empty.</p>';$('cartTotal').textContent='Total: '+money(cart.reduce((a,x)=>a+x.price*x.qty,0))}
+function addCart(id){
+  let p=products.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  let row=cart.find(x=>String(x.id)===String(id));
+  if(row){
+    if(row.qty>=Number(p.item_count)){
+      alert('Available stock only: '+p.item_count);
+      return;
+    }
+    row.qty++;
+  }else{
+    if(Number(p.item_count)<=0){
+      alert('Out of stock');
+      return;
+    }
+    cart.push({
+      id:p.id,
+      name:p.name,
+      price:Number(p.price),
+      qty:1,
+      stock:Number(p.item_count)
+    });
+  }
+  drawCart();
+}
+function drawCart(){
+  $('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);
+
+  $('cartItems').innerHTML=cart.length?cart.map(x=>`
+    <div class="cartrow">
+      <div>
+        <b>${safe(x.name)}</b>
+        <div style="margin-top:8px">
+          <button class="secondary" data-minus="${safe(x.id)}">−</button>
+          <b style="padding:0 10px">${x.qty}</b>
+          <button class="secondary" data-plus="${safe(x.id)}">+</button>
+          <button data-remove="${safe(x.id)}" style="background:#a64b43;margin-left:8px">Delete</button>
+        </div>
+      </div>
+      <strong>${money(x.price*x.qty)}</strong>
+    </div>
+  `).join(''):'<p class="muted">Your cart is empty.</p>';
+
+  $('cartTotal').textContent='Total: '+money(
+    cart.reduce((a,x)=>a+x.price*x.qty,0)
+  );
+
+  document.querySelectorAll('[data-minus]').forEach(b=>{
+    b.onclick=()=>{
+      let x=cart.find(x=>String(x.id)===b.dataset.minus);
+      if(x){
+        x.qty--;
+        if(x.qty<=0)cart=cart.filter(y=>String(y.id)!==b.dataset.minus);
+        drawCart();
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-plus]').forEach(b=>{
+    b.onclick=()=>{
+      let x=cart.find(x=>String(x.id)===b.dataset.plus);
+      if(x){
+        if(x.qty>=x.stock){
+          alert('Available stock only: '+x.stock);
+          return;
+        }
+        x.qty++;
+        drawCart();
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-remove]').forEach(b=>{
+    b.onclick=()=>{
+      if(confirm('Remove this product from cart?')){
+        cart=cart.filter(x=>String(x.id)!==b.dataset.remove);
+        drawCart();
+      }
+    };
+  });
+}
 $('cartBtn').onclick=()=>{$('cartPanel').classList.remove('hidden');$('adminPanel').classList.add('hidden');$('cartPanel').scrollIntoView({behavior:'smooth'})};$('closeCart').onclick=()=>$('cartPanel').classList.add('hidden');
 $('orderBtn').onclick=()=>{if(!cart.length){alert('Your cart is empty.');return}let name=$('buyerName').value.trim(),phone=$('buyerPhone').value.trim(),address=$('buyerAddress').value.trim();if(!name||!phone||!address){alert('Please enter your name, phone number and delivery address.');return}let total=cart.reduce((a,x)=>a+x.price*x.qty,0);let msg=`Assalamu Alaikum Hijabi Queen Boutique!%0AOrder request:%0A${cart.map(x=>`• ${x.name} x ${x.qty} = ${money(x.price*x.qty)}`).join('%0A')}%0ATotal: ${money(total)}%0AName: ${name}%0APhone: ${phone}%0AAddress: ${address}`;window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`,'_blank')};
 $('adminBtn').onclick=()=>{$('adminPanel').classList.toggle('hidden');$('cartPanel').classList.add('hidden');$('adminPanel').scrollIntoView({behavior:'smooth'});refreshAuth()};
